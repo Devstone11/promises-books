@@ -35,11 +35,7 @@ router.get('/new', function(req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  var errors = [];
-  if(!req.body.title.trim()){errors.push("Title cannot be blank")}
-  if(!req.body.genre.trim()){errors.push("Genre cannot be blank")}
-  if(!req.body.cover_url.trim()){errors.push("Cover image cannot be blank")}
-  if(!req.body.description.trim()){errors.push("Description cannot be blank")}
+  var errors = helpers.validate(req.body);
   if(errors.length){
     res.render('books/new', { book: req.body, errors: errors })
   } else {
@@ -78,11 +74,7 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/:id', function(req, res, next) {
-  var errors = [];
-  if(!req.body.title.trim()){errors.push("Title cannot be blank")}
-  if(!req.body.genre.trim()){errors.push("Genre cannot be blank")}
-  if(!req.body.cover_url.trim()){errors.push("Cover image cannot be blank")}
-  if(!req.body.description.trim()){errors.push("Description cannot be blank")}
+  var errors = helpers.validate(req.body);
   if(errors.length){
     res.render('books/edit', { book: req.body, errors: errors })
   } else {
