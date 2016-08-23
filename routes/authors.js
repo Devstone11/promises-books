@@ -18,6 +18,19 @@ function Authors_Books() {
 
 
 router.get('/', function(req, res, next) {
+  Authors().then(function(authors) {
+    Promise.all(
+      authors.map(function(author) {
+        return helpers.getAuthorBooks(author).then(function(books) {
+          author.books = books;
+          return author;
+        })
+      })
+    ).then(function(authors) {
+      res.render('authors/index.jade', {authors: authors})
+    })
+  })
+
   // get all authors from Authors
   // THEN for each author, go get all of their book ids from Authors_Books
   // THEN go get all that author's books
@@ -64,6 +77,13 @@ router.post('/:id/delete', function (req, res, next) {
 })
 
 router.get('/:id/edit', function (req, res, next) {
+  Authors().where('id', req.params.id).first().then(function(author) {
+    helpers.getAuthorBooks(author).then(function(books) {
+      Books().then(function(allBooks) {
+        res.render('authors/edit.jade', { author: author, books: allBooks, author_books: books })
+      })
+    })
+  })
   // find the author in Authors
   // get all of the authors book_ids from Authors_Books
   // get all of the authors books from BOOKs
@@ -83,6 +103,19 @@ router.post('/:id', function (req, res, next) {
 })
 
 router.get('/:id', function (req, res, next) {
+  // Authors().where('id', req.params.id).first().then(function(author) {
+  //   helpers.getAuthorBooks(author).then(function(books) {
+  //     res.render('authors/show.jade', { author: author, books: books })
+  //   })
+  // })
+  Authors().where('id', req.params.id).first().then(function(author) {
+    return author;
+  }).then(function(author) {
+    helpers.getAuthorBooks(author).then(function(books) {
+      res.render('authors/show.jade', { author: author, books: books })
+    })
+  })
+})
   // find the author in Authors
   // get all of the authors book_ids from Authors_Books
   // get all of the authors books from BOOKs
