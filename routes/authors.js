@@ -79,17 +79,20 @@ router.post('/:id/delete', function (req, res, next) {
 router.get('/:id/edit', function (req, res, next) {
   Authors().where('id', req.params.id).first().then(function(author) {
     helpers.getAuthorBooks(author).then(function(books) {
+      return {author: author, author_books: books}
+    }).then(function(data) {
       Books().then(function(allBooks) {
-        res.render('authors/edit.jade', { author: author, books: allBooks, author_books: books })
+        res.render('authors/edit.jade', {author: data.author, books: allBooks, author_books: data.author_books})
       })
     })
   })
+})
   // find the author in Authors
   // get all of the authors book_ids from Authors_Books
   // get all of the authors books from BOOKs
   // render the corresponding template
   // use locals to pass books and author to the view
-})
+// })
 
 router.post('/:id', function (req, res, next) {
   var bookIds = req.body.book_ids.split(",");
@@ -103,14 +106,7 @@ router.post('/:id', function (req, res, next) {
 })
 
 router.get('/:id', function (req, res, next) {
-  // Authors().where('id', req.params.id).first().then(function(author) {
-  //   helpers.getAuthorBooks(author).then(function(books) {
-  //     res.render('authors/show.jade', { author: author, books: books })
-  //   })
-  // })
   Authors().where('id', req.params.id).first().then(function(author) {
-    return author;
-  }).then(function(author) {
     helpers.getAuthorBooks(author).then(function(books) {
       res.render('authors/show.jade', { author: author, books: books })
     })
@@ -121,6 +117,6 @@ router.get('/:id', function (req, res, next) {
   // get all of the authors books from BOOKs
   // render the corresponding template
   // use locals to pass books and author to the view
-})
+// })
 
 module.exports = router;
