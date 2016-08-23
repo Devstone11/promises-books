@@ -3,20 +3,8 @@ var router = express.Router();
 var knex = require('../db/knex');
 var helpers = require('../lib/helpers')
 
-function Books() {
-  return knex('books');
-}
-
-function Authors_Books() {
-  return knex('authors_books');
-}
-
-function Authors() {
-  return knex('authors');
-}
-
 router.get('/', function(req, res, next) {
-  Books().then(function(books) {
+  helpers.Books().then(function(books) {
     Promise.all(
       books.map(function(book) {
         return helpers.getBookAuthors(book).then(function(authors) {
@@ -39,14 +27,14 @@ router.post('/', function (req, res, next) {
   if(errors.length){
     res.render('books/new', { book: req.body, errors: errors })
   } else {
-    Books().insert(req.body).then(function (results) {
+    helpers.Books().insert(req.body).then(function (results) {
         res.redirect('/');
     })
   }
 })
 
 router.get('/:id/delete', function(req, res, next) {
-  Books().where('id', req.params.id).first().then(function(book) {
+  helpers.Books().where('id', req.params.id).first().then(function(book) {
     helpers.getBookAuthors(book).then(function(authors) {
       res.render('books/delete', {book: book, authors: authors})
     })
@@ -54,19 +42,19 @@ router.get('/:id/delete', function(req, res, next) {
 });
 
 router.post('/:id/delete', function(req, res, next) {
-  Books().where('id', req.params.id).del().then(function (book) {
+  helpers.Books().where('id', req.params.id).del().then(function (book) {
     res.redirect('/books');
   })
 });
 
 router.get('/:id/edit', function(req, res, next) {
-  Books().where('id', req.params.id).first().then(function (book) {
+  helpers.Books().where('id', req.params.id).first().then(function (book) {
     res.render('books/edit', {book: book});
   })
 });
 
 router.get('/:id', function(req, res, next) {
-  Books().where('id', req.params.id).first().then(function(book){
+  helpers.Books().where('id', req.params.id).first().then(function(book){
     helpers.getBookAuthors(book).then(function(authors) {
       res.render('books/show', {book: book, authors: authors});
     })
@@ -78,7 +66,7 @@ router.post('/:id', function(req, res, next) {
   if(errors.length){
     res.render('books/edit', { book: req.body, errors: errors })
   } else {
-    Books().where('id', req.params.id).update(req.body).then(function (results) {
+    helpers.Books().where('id', req.params.id).update(req.body).then(function (results) {
       res.redirect('/');
     })
   }
