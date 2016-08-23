@@ -16,7 +16,18 @@ function Authors() {
 }
 
 router.get('/', function(req, res, next) {
-  // your code here
+  Books().then(function(books) {
+    Promise.all(
+      books.map(function(book) {
+        return helpers.getBookAuthors(book).then(function(authors) {
+          book.authors = authors;
+          return book;
+        })
+      })
+    ).then(function(books) {
+      res.render('books/index', {books: books})
+    })
+  })
 });
 
 router.get('/new', function(req, res, next) {
@@ -39,7 +50,11 @@ router.post('/', function (req, res, next) {
 })
 
 router.get('/:id/delete', function(req, res, next) {
-  // your code here
+  Books().where('id', req.params.id).first().then(function(book) {
+    helpers.getBookAuthors(book).then(function(authors) {
+      res.render('books/delete', {book: book, authors: authors})
+    })
+  })
 });
 
 router.post('/:id/delete', function(req, res, next) {
@@ -55,7 +70,11 @@ router.get('/:id/edit', function(req, res, next) {
 });
 
 router.get('/:id', function(req, res, next) {
-  // your code here 
+  Books().where('id', req.params.id).first().then(function(book){
+    helpers.getBookAuthors(book).then(function(authors) {
+      res.render('books/show', {book: book, authors: authors});
+    })
+  })
 });
 
 router.post('/:id', function(req, res, next) {
